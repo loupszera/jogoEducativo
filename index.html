@@ -13,18 +13,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
     <!-- Logo Google Arts & Culture fixo -->
     <a href="https://artsandculture.google.com/preview/partner/crab-sebrae" target="_blank" rel="noopener" class="google-arts-logo">
-    <img src="img/Google-Arts-Culture-Logo.png" alt="Google Arts & Culture" />
+    <img src="assets/images/Google-Arts-Culture-Logo.png" alt="Google Arts & Culture" />
     </a>
 
     <div class="w-full max-w-2xl mx-auto">
         <div class="flex justify-center mb-4">
             <a href="https://crab.sebrae.com.br/" target="_blank" rel="noopener">
-                <img src="img/logo crab sebrae.png" alt="Logo CRAB Sebrae" style="height: 100px; max-width: 260px; object-fit: contain;" />
+                <img src="assets/images/logo crab sebrae.png" alt="Logo CRAB Sebrae" style="height: 100px; max-width: 260px; object-fit: contain;" />
             </a>
         </div>
         <h1 class="text-3xl md:text-4xl font-display text-white mb-2 text-center">Jogo da memória</h1>
@@ -59,182 +59,6 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const gameBoard = document.getElementById('game-board');
-            const movesCountSpan = document.getElementById('moves-count');
-            const restartButton = document.getElementById('restart-button');
-            const playAgainButton = document.getElementById('play-again-button');
-            const winModal = document.getElementById('win-modal');
-            const finalMovesSpan = document.getElementById('final-moves');
-
-            // --- Dados do Jogo ---
-                const craftItems = [
-                    { id: 'ze-crente', img: 'img2/Captura de tela 2025-09-05 112516.png' },
-                    { id: 'adalton-fernandes', img: 'img2/Captura de tela 2025-09-05 112553.png' },
-                    { id: 'mario-teles', img: 'img2/Captura de tela 2025-09-05 112606.png' },
-                    { id: 'joao-borges', img: 'img2/Captura de tela 2025-09-05 112617.png' },
-                    { id: 'kalapalo', img: 'img2/Captura de tela 2025-09-05 112627.png' },
-                    { id: 'assurini', img: 'img2/Captura de tela 2025-09-05 112641.png' },
-                    { id: 'espedito-seleiro', img: 'img2/Captura de tela 2025-09-05 112723.png' },
-                    { id: 'diomar-freitas', img: 'img2/Captura de tela 2025-09-05 112733.png' },
-                ];
-
-            // --- Variáveis de Estado ---
-            let cards = [];
-            let flippedCards = [];
-            let matchedPairs = 0;
-            let moves = 0;
-            let canFlip = true;
-
-            // --- Funções ---
-
-            /**
-             * Embaralha um array.
-             * @param {Array} array O array a ser embaralhado.
-             */
-            function shuffle(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
-                }
-            }
-
-            /**
-             * Cria e exibe as cartas no tabuleiro.
-             */
-            function createBoard() {
-                // Duplicate items to create pairs and shuffle them
-                const gameItems = [...craftItems, ...craftItems];
-                shuffle(gameItems);
-
-                gameBoard.innerHTML = ''; // Limpa o tabuleiro anterior
-                cards = []; // Reinicia o array de cartas
-
-                gameItems.forEach(item => {
-                    const cardElement = document.createElement('div');
-                    cardElement.classList.add('card');
-                    cardElement.dataset.id = item.id;
-
-                    cardElement.innerHTML = `
-                        <div class="card-face card-front">
-                            <img src="img2/verso-carta.png" alt="Verso da Carta" class="card-front-img" />
-                        </div>
-                        <div class="card-face card-back">
-                            <img src="${item.img}" alt="${item.id}" class="card-img" />
-                        </div>
-                    `;
-                    cardElement.addEventListener('click', handleCardClick);
-                    gameBoard.appendChild(cardElement);
-                    cards.push(cardElement);
-                });
-            }
-
-            /**
-             * Reseta todas as variáveis do jogo e cria um novo tabuleiro.
-             */
-            function restartGame() {
-                flippedCards = [];
-                matchedPairs = 0;
-                moves = 0;
-                canFlip = true;
-                movesCountSpan.textContent = '0';
-                winModal.classList.remove('visible');
-                createBoard();
-            }
-
-            /**
-             * Lida com a lógica ao clicar em uma carta.
-             * @param {Event} event O evento de clique.
-             */
-            function handleCardClick(event) {
-                if (!canFlip) return;
-                
-                const clickedCard = event.currentTarget;
-
-                // Evita clicar na mesma carta duas vezes ou em uma carta já combinada
-                if (clickedCard.classList.contains('flipped') || clickedCard.classList.contains('matched')) {
-                    return;
-                }
-
-                flipCard(clickedCard);
-                flippedCards.push(clickedCard);
-
-                if (flippedCards.length === 2) {
-                    canFlip = false; // Prevent flipping more cards
-                    incrementMoves();
-                    checkForMatch();
-                }
-            }
-
-            /**
-             * Vira a carta para mostrar o verso.
-             * @param {HTMLElement} card O elemento da carta a ser virado.
-             */
-            function flipCard(card) {
-                card.classList.add('flipped');
-            }
-
-            /**
-             * Desvira a carta para mostrar a frente.
-             * @param {HTMLElement} card O elemento da carta a ser desvirado.
-             */
-            function unflipCard(card) {
-                card.classList.remove('flipped');
-            }
-
-            /**
-             * Verifica se as duas cartas viradas são um par.
-             */
-            function checkForMatch() {
-                const [card1, card2] = flippedCards;
-                
-                if (card1.dataset.id === card2.dataset.id) {
-                    // É um par!
-                    card1.classList.add('matched');
-                    card2.classList.add('matched');
-                    matchedPairs++;
-                    flippedCards = [];
-                    canFlip = true;
-                    checkWinCondition();
-                } else {
-                    // Não é par, desvira após um tempo
-                    setTimeout(() => {
-                        unflipCard(card1);
-                        unflipCard(card2);
-                        flippedCards = [];
-                        canFlip = true;
-                    }, 1200);
-                }
-            }
-            
-            /**
-             * Incrementa o contador de movimentos e atualiza a exibição.
-             */
-            function incrementMoves() {
-                moves++;
-                movesCountSpan.textContent = moves;
-            }
-
-            /**
-             * Verifica se o jogo foi vencido (todos os pares encontrados).
-             */
-            function checkWinCondition() {
-                if (matchedPairs === craftItems.length) {
-                    setTimeout(() => {
-                        finalMovesSpan.textContent = moves;
-                        winModal.classList.add('visible');
-                    }, 500);
-                }
-            }
-
-            // --- Listeners de Eventos ---
-            restartButton.addEventListener('click', restartGame);
-            playAgainButton.addEventListener('click', restartGame);
-
-            // --- Início do Jogo ---
-            restartGame();
-        });
-    </script>
+    <script src="assets/js/script.js" defer></script>
 </body>
 </html>

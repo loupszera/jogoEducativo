@@ -37,7 +37,7 @@ html, body, button, input, textarea, select {
     font-family: 'Poppins', Arial, Helvetica, sans-serif;
 }
     background-color: #40BBFF; /* bg-orange-50 */
-    background-image: url('img/fundo.svg');
+    background-image: url('../images/fundo.svg');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
